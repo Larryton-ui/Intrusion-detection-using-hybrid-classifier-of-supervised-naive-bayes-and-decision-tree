@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intrusion Detection</title>
+    <style>
+        body {
+            background-color: lightblue;
+        }
+        h1 {
+            color: red;
+            text-align: center;
+        }
+        .center-align {
+            text-align: center;
+        }
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .upload-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+        #preview-table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        #preview-table th,
+        #preview-table td {
+            padding: 5px 10px;
+            border: 1px solid black;
+        }
+
+
+        
+    </style>
+    <script>
+        function previewFile() {
+            var fileInput = document.getElementById('file-upload');
+            var file = fileInput.files[0];
+            var previewTable = document.getElementById('preview-table');
+
+
+            // Clear previous table content
+            while (previewTable.firstChild) {
+                previewTable.removeChild(previewTable.firstChild);
+            }
+
+
+            if (file) {
+                var reader = new FileReader();
+
+
+                reader.onload = function(event) {
+                    var fileContent = event.target.result;
+                    var lines = fileContent.split('\n');
+                   
+                    // Create table header
+                    var headerRow = document.createElement('tr');
+                    var headers = lines[0].split(',');
+                    for (var i = 0; i < headers.length; i++) {
+                        var headerCell = document.createElement('th');
+                        headerCell.textContent = headers[i];
+                        headerRow.appendChild(headerCell);
+                    }
+                    previewTable.appendChild(headerRow);
+
+
+                    // Create table rows
+                    for (var j = 1; j < lines.length; j++) {
+                        var row = document.createElement('tr');
+                        var rowData = lines[j].split(',');
+                        for (var k = 0; k < rowData.length; k++) {
+                            var cell = document.createElement('td');
+                            cell.textContent = rowData[k];
+                            row.appendChild(cell);
+                        }
+                        previewTable.appendChild(row);
+                    }
+                };
+
+
+                reader.readAsText(file);
+            }
+        }
+        function predict() {
+            
+        var fileInput = document.getElementById('file-upload');
+        var file = fileInput.files[0];
+
+        if (file) {
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                // Handle the prediction result
+                console.log(result);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error('Error:', error);
+            });
+        } else {
+            console.log('No file selected.');
+        }
+    }
+
+      
+    </script>
+</head>
+<body>
+    <h1>Intrusion Detection</h1>
+    <div class="center-align upload-container">
+        <input type="file" id="file-upload" class="upload-input">
+    </div>
+    <div class="center-align">
+        <button type="button" onclick="previewFile()">Preview</button>
+        <button type="button" onclick="predict()">Predict</button>
+
+    </div>
+    <div class="center-align">
+        <table id="preview-table"></table>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
